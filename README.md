@@ -19,7 +19,7 @@ Configuration sample:
     "accessories": [
       {
         "accessory": "SmartLedStrip",
-        "name": "Kitchen Cabinet Strip",
+        "name": "Bedroom LedStrip",
         "rPin": 22,
         "gPin": 27,
         "bPin": 17
