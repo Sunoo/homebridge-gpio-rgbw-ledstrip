@@ -19,14 +19,17 @@ function SmartLedStripAccessory(log, config) {
   this.rPin     = config['rPin'];
   this.gPin     = config['gPin'];
   this.bPin     = config['bPin'];
+  this.wPin     = config['wPin'];
 
   if (!this.rPin) throw new Error("You must provide a config value for redPin.");
   if (!this.gPin) throw new Error("You must provide a config value for greenPin.");
   if (!this.bPin) throw new Error("You must provide a config value for bluePin.");
+  if (!this.wPin) throw new Error("You must provide a config value for whitePin.");
 
   this.rLeds = new Gpio(this.rPin, {mode: Gpio.OUTPUT});
   this.gLeds = new Gpio(this.gPin, {mode: Gpio.OUTPUT});
   this.bLeds = new Gpio(this.bPin, {mode: Gpio.OUTPUT});
+  this.wLeds = new Gpio(this.wPin, {mode: Gpio.OUTPUT});
 }
 
 SmartLedStripAccessory.prototype = {
@@ -36,9 +39,9 @@ SmartLedStripAccessory.prototype = {
     let informationService = new Service.AccessoryInformation();
 
     informationService
-    .setCharacteristic(Characteristic.Manufacturer, 'Manfredi Pistone')
-    .setCharacteristic(Characteristic.Model, 'Homebridge RGB LedStrip')
-    .setCharacteristic(Characteristic.SerialNumber, '16-26-36');
+    .setCharacteristic(Characteristic.Manufacturer, 'Sunoo')
+    .setCharacteristic(Characteristic.Model, 'RGBW LED Strip')
+    .setCharacteristic(Characteristic.SerialNumber, '6345789');
 
     let smartLedStripService = new Service.Lightbulb(this.name);
 
@@ -61,7 +64,7 @@ SmartLedStripAccessory.prototype = {
     this.informationService = informationService;
     this.smartLedStripService = smartLedStripService;
 
-    this.log('Homebridge RGB LedStrip Initialized');
+    //this.log('Homebridge RGB LedStrip Initialized');
 
     return [informationService, smartLedStripService];
   },
@@ -101,10 +104,14 @@ SmartLedStripAccessory.prototype = {
 
   updateRGB : function(red, green, blue)
   {
-      this.log("Setting rgb values to: Red: "+red + " Green: "+green+ " Blue: "+blue);
+      //this.log("Setting rgb values to: Red: "+red + " Green: "+green+ " Blue: "+blue);
+      if ((red==green)&&(red==blue)){
+      this.wLeds.pwmWrite(red);
+      }else{
       this.rLeds.pwmWrite(red);
       this.gLeds.pwmWrite(green);
       this.bLeds.pwmWrite(blue);
+      }
   }
 
 }
