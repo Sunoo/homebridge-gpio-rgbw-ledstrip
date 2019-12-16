@@ -30,6 +30,6 @@
   },
   "dependencies": {
     "color-convert": ">=2.0.0",
-    "pigpio": "1.2.3"
+    "pigpio": ">=1.2.3"
   }
 }
