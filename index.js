@@ -69,10 +69,10 @@ SmartLedStripAccessory.prototype = {
             .addCharacteristic(new Characteristic.Saturation())
             .on('change', this.toggleState.bind(this));
 
+        smartLedStripService.getCharacteristic(Characteristic.Brightness).value = 100
+
         this.informationService = informationService;
         this.smartLedStripService = smartLedStripService;
-
-        //this.log('Homebridge RGB LedStrip Initialized');
 
         return [informationService, smartLedStripService];
     },
@@ -96,15 +96,14 @@ SmartLedStripAccessory.prototype = {
     toggleState: function() {
         if (!this.isOn()) {
             this.updateRGB(0, 0, 0);
-            return;
-        }
-
-        var brightness = this.getBrightness();
-        if (brightness != 0) {
-            var rgb = converter.hsv.rgb([this.getHue(), this.getSaturation(), brightness]);
-            this.updateRGB(rgb[0], rgb[1], rgb[2]);
         } else {
-            this.updateRGB(0, 0, 0);
+            var brightness = this.getBrightness();
+            if (brightness != 0) {
+                var rgb = converter.hsv.rgb([this.getHue(), this.getSaturation(), brightness]);
+                this.updateRGB(rgb[0], rgb[1], rgb[2]);
+            } else {
+                this.updateRGB(0, 0, 0);
+            }
         }
     },
 
