@@ -109,13 +109,14 @@ SmartLedStripAccessory.prototype = {
     },
 
     updateRGB: function(red, green, blue) {
-        //this.log("Setting rgb values to: Red: "+red + " Green: "+green+ " Blue: "+blue);
         if ((red == green) && (red == blue)) {
+            this.log("Setting white: " + red);
             this.rLeds.pwmWrite(0);
             this.gLeds.pwmWrite(0);
             this.bLeds.pwmWrite(0);
             this.wLeds.pwmWrite(red);
         } else {
+            this.log("Setting RGB: " + red + ", " + green + ", " + blue);
             this.rLeds.pwmWrite(red);
             this.gLeds.pwmWrite(green);
             this.bLeds.pwmWrite(blue);
