@@ -1,7 +1,7 @@
 # homebridge-gpio-rgb-ledstrip
 [RPi](https://www.raspberrypi.org) GPIO based LED Strip plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
-Built on top of [rpio](https://www.npmjs.com/package/rpio) with javascript, inspired by [GiniaE/homebridge-gpio-ledstrip](https://github.com/GiniaE/homebridge-gpio-ledstrip)
+Built on top of [pigpio](https://www.npmjs.com/package/pigpio) with javascript, inspired by [GiniaE/homebridge-gpio-ledstrip](https://github.com/GiniaE/homebridge-gpio-ledstrip)
 
 It works out of the box with nodejs 12!
 
