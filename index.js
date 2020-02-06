@@ -76,27 +76,13 @@ SmartLedStripAccessory.prototype = {
         return [informationService, smartLedStripService];
     },
 
-    isOn: function() {
-        return this.smartLedStripService.getCharacteristic(Characteristic.On).value;
-    },
-
-    getBrightness: function() {
-        return this.smartLedStripService.getCharacteristic(Characteristic.Brightness).value;
-    },
-
-    getHue: function() {
-        return this.smartLedStripService.getCharacteristic(Characteristic.Hue).value;
-    },
-
-    getSaturation: function() {
-        return this.smartLedStripService.getCharacteristic(Characteristic.Saturation).value;
-    },
-
     toggleState: function() {
-        if (!this.isOn()) {
+        if (!this.smartLedStripService.getCharacteristic(Characteristic.On).value) {
             this.updateRGBW(0, 0, 0, 0);
         } else {
-            var rgbw = this.hsi2rgbw(this.getHue(), this.getSaturation(), this.getBrightness());
+            var rgbw = this.hsb2rgbw(this.smartLedStripService.getCharacteristic(Characteristic.Hue).value,
+                this.smartLedStripService.getCharacteristic(Characteristic.Saturation).value,
+                this.smartLedStripService.getCharacteristic(Characteristic.Brightness).value);
             this.updateRGBW(rgbw.R, rgbw.G, rgbw.B, rgbw.W);
         }
     },
@@ -109,73 +95,45 @@ SmartLedStripAccessory.prototype = {
         this.wLeds.pwmWrite(white);
     },
 
-    hsi2rgbw: function(H, S, I) {
+    hsb2rgbw: function(H, S, B) {
+        var rgbw = {
+            R: 0,
+            G: 0,
+            B: 0,
+            W: 0
+        }
+
         if (H == 0 && S == 0) {
-            return {
-                R: 0,
-                G: 0,
-                B: 0,
-                W: I
-            };
+            rgbw.W = B;
         } else {
             var segment = Math.floor(H / 60);
             var offset = H % 60;
-            var mid = Math.round((I * offset) / 60);
+            var mid = (B * offset) / 60;
 
-            var white = Math.round((I / 100) * (100 - S));
+            rgbw.W = Math.round((B / 100) * (100 - S));
 
             if (segment == 0) {
-                return {
-                    R: I,
-                    G: mid,
-                    B: 0,
-                    W: white
-                };
+                rgbw.R = Math.round((S / 100) * B);
+                rgbw.G = Math.round((S / 100) * mid);
             } else if (segment == 1) {
-                return {
-                    R: I - mid,
-                    G: I,
-                    B: 0,
-                    W: white
-                };
+                rgbw.R = Math.round((S / 100) * (B - mid));
+                rgbw.G = Math.round((S / 100) * B);
             } else if (segment == 2) {
-                return {
-                    R: 0,
-                    G: I,
-                    B: mid,
-                    W: white
-                };
+                rgbw.G = Math.round((S / 100) * B);
+                rgbw.B = Math.round((S / 100) * mid);
             } else if (segment == 3) {
-                return {
-                    R: 0,
-                    G: I - mid,
-                    B: I,
-                    W: white
-                };
+                rgbw.G = Math.round((S / 100) * (B - mid));
+                rgbw.B = Math.round((S / 100) * B);
             } else if (segment == 4) {
-                return {
-                    R: mid,
-                    G: 0,
-                    B: I,
-                    W: white
-                };
+                rgbw.R = Math.round((S / 100) * mid);
+                rgbw.B = Math.round((S / 100) * B);
             } else if (segment == 5) {
-                return {
-                    R: I,
-                    G: 0,
-                    B: I - mid,
-                    W: white
-                };
-            } else {
-                //Should never get here, but this will prevent a crash if it does
-                return {
-                    R: 0,
-                    G: 0,
-                    B: 0,
-                    W: 0
-                };
+                rgbw.R = Math.round((S / 100) * B);
+                rgbw.B = Math.round((S / 100) * (B - mid));
             }
         }
+
+        return rgbw;
     }
 
 }
