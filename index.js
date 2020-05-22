@@ -8,7 +8,7 @@ module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
 
-    homebridge.registerAccessory('homebridge-gpio-rgb-ledstrip', 'SmartLedStrip', SmartLedStripAccessory);
+    homebridge.registerAccessory('homebridge-gpio-rgbw-ledstrip', 'SmartLedStrip', SmartLedStripAccessory);
 }
 
 function SmartLedStripAccessory(log, config) {
