@@ -2,7 +2,7 @@
 
 var Service, Characteristic;
 
-const Gpio = require('pigpio').Gpio;
+const piblaster = require('pi-blaster.js');
 
 module.exports = function(homebridge) {
     Service = homebridge.hap.Service;
@@ -19,24 +19,6 @@ function SmartLedStripAccessory(log, config) {
     this.gPin = config['gPin'];
     this.bPin = config['bPin'];
     this.wPin = config['wPin'];
-
-    if (!this.rPin) throw new Error("You must provide a config value for redPin.");
-    if (!this.gPin) throw new Error("You must provide a config value for greenPin.");
-    if (!this.bPin) throw new Error("You must provide a config value for bluePin.");
-    if (!this.wPin) throw new Error("You must provide a config value for whitePin.");
-
-    this.rLeds = new Gpio(this.rPin, {
-        mode: Gpio.OUTPUT
-    });
-    this.gLeds = new Gpio(this.gPin, {
-        mode: Gpio.OUTPUT
-    });
-    this.bLeds = new Gpio(this.bPin, {
-        mode: Gpio.OUTPUT
-    });
-    this.wLeds = new Gpio(this.wPin, {
-        mode: Gpio.OUTPUT
-    });
 }
 
 SmartLedStripAccessory.prototype = {
@@ -89,10 +71,10 @@ SmartLedStripAccessory.prototype = {
 
     updateRGBW: function(red, green, blue, white) {
         this.log("Setting RGBW: " + red + ", " + green + ", " + blue + ", " + white);
-        this.rLeds.pwmWrite(red);
-        this.gLeds.pwmWrite(green);
-        this.bLeds.pwmWrite(blue);
-        this.wLeds.pwmWrite(white);
+        piblaster.setPwm(this.rPin, red / 100);
+        piblaster.setPwm(this.gPin, green / 100);
+        piblaster.setPwm(this.bPin, blue / 100);
+        piblaster.setPwm(this.wPin, white / 100);
     },
 
     hsb2rgbw: function(H, S, B) {

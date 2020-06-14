@@ -1,13 +1,11 @@
 # homebridge-gpio-rgb-ledstrip
 [RPi](https://www.raspberrypi.org) GPIO based LED Strip plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
-Built on top of [pigpio](https://www.npmjs.com/package/pigpio) with javascript, inspired by [GiniaE/homebridge-gpio-ledstrip](https://github.com/GiniaE/homebridge-gpio-ledstrip)
-
-It works out of the box with nodejs 12!
-
 # Installation
 
 1. Install homebridge using: npm install -g homebridge
+1. Install pi-blaster using [these instructions](https://github.com/sarfata/pi-blaster#how-to-install).
+1. Update pi-blaster DAEMON\_OPTS to contain the pins your LED strip is connected to ([instructions](https://github.com/sarfata/pi-blaster#warnings-and-other-caveats)).
 2. Install this plugin using: npm install -g homebridge-gpio-rgbw-ledstrip
 3. Update your configuration file. See sample config.json snippet below.
 
