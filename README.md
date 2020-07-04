@@ -1,4 +1,6 @@
 # homebridge-gpio-rgb-ledstrip
+[![npm](https://img.shields.io/npm/v/homebridge-gpio-rgb-ledstrip) ![npm](https://img.shields.io/npm/dt/homebridge-gpio-rgb-ledstrip)](https://www.npmjs.com/package/homebridge-gpio-rgb-ledstrip)
+
 [RPi](https://www.raspberrypi.org) GPIO based LED Strip plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
 # Installation
