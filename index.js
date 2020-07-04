@@ -70,7 +70,7 @@ SmartLedStripAccessory.prototype = {
     },
 
     updateRGBW: function(red, green, blue, white) {
-        this.log("Setting RGBW: " + red + ", " + green + ", " + blue + ", " + white);
+        this.log.debug("Setting RGBW: " + red + ", " + green + ", " + blue + ", " + white);
         piblaster.setPwm(this.rPin, red / 100);
         piblaster.setPwm(this.gPin, green / 100);
         piblaster.setPwm(this.bPin, blue / 100);

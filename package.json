@@ -2,7 +2,7 @@
   "displayName": "Homebridge GPIO RGBW LED Strip",
   "name": "homebridge-gpio-rgbw-ledstrip",
   "description": "Raspberry Pi GPIO based LED Strip plugin for Homebridge",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "index.js",
   "repository": {
     "type": "git",
