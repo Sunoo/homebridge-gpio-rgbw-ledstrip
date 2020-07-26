@@ -13,6 +13,13 @@ let hap: HAP;
 const PLUGIN_NAME = 'homebridge-gpio-rgbw-ledstrip';
 const ACCESSORY_NAME = 'SmartLedStrip';
 
+type RGBW = {
+  R: number,
+  G: number,
+  B: number,
+  W: number
+};
+
 class SmartLedStrip implements AccessoryPlugin {
   private readonly log: Logging;
   private readonly name: string;
@@ -87,7 +94,7 @@ class SmartLedStrip implements AccessoryPlugin {
     piblaster.setPwm(this.wPin, white / 100);
   }
 
-  hsb2rgbw(H: number, S: number, B: number): any {
+  hsb2rgbw(H: number, S: number, B: number): RGBW {
     const rgbw = {
       R: 0,
       G: 0,
