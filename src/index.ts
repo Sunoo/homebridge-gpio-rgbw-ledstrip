@@ -38,8 +38,12 @@ class SmartLedStrip implements AccessoryPlugin {
       this.log.error('Please verify that all GPIO pins have been configured.');
       ready = false;
     }
-    if (fs.statSync('/dev/pi-blaster').isFIFO()) {
-      this.log.error('Error connecting to pi-blaster. Please make sure that is correctly installed.');
+    try {
+      if (!fs.statSync('/dev/pi-blaster').isFIFO()) {
+        throw new Error('not a FIFO, /dev/pi-blaster');
+      }
+    } catch (err) {
+      this.log.error('Error connecting to pi-blaster, please make sure that is correctly installed: ' + err);
       ready = false;
     }
 
