@@ -6,6 +6,7 @@ import {
   Logging,
   Service
 } from 'homebridge';
+import { SmartLedStripConfig } from './configTypes';
 const piblaster = require('pi-blaster.js'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 let hap: HAP;
@@ -22,21 +23,12 @@ type RGBW = {
 
 class SmartLedStrip implements AccessoryPlugin {
   private readonly log: Logging;
-  private readonly name: string;
-  private readonly rPin: number;
-  private readonly gPin: number;
-  private readonly bPin: number;
-  private readonly wPin: number;
+  private readonly config: SmartLedStripConfig;
   private service?: Service;
 
   constructor(log: Logging, config: AccessoryConfig, api: API) { // eslint-disable-line @typescript-eslint/no-unused-vars
     this.log = log;
-    this.name = config['name'];
-
-    this.rPin = config['rPin'];
-    this.gPin = config['gPin'];
-    this.bPin = config['bPin'];
-    this.wPin = config['wPin'];
+    this.config = config as unknown as SmartLedStripConfig;
   }
 
   getServices(): Array<Service> {
@@ -45,9 +37,10 @@ class SmartLedStrip implements AccessoryPlugin {
     accInfo
       .setCharacteristic(hap.Characteristic.Manufacturer, 'Sunoo')
       .setCharacteristic(hap.Characteristic.Model, 'RGBW LED Strip')
-      .setCharacteristic(hap.Characteristic.SerialNumber, this.rPin + ':' + this.gPin + ':' + this.bPin + ':' + this.wPin);
+      .setCharacteristic(hap.Characteristic.SerialNumber, this.config.rPin + ':' +
+        this.config.gPin + ':' + this.config.bPin + ':' + this.config.wPin);
 
-    const service = new hap.Service.Lightbulb(this.name);
+    const service = new hap.Service.Lightbulb(this.config.name);
 
     service
       .getCharacteristic(hap.Characteristic.On)
@@ -88,10 +81,10 @@ class SmartLedStrip implements AccessoryPlugin {
 
   updateRGBW(red: number, green: number, blue: number, white: number): void {
     this.log.debug('Setting RGBW: ' + red + ', ' + green + ', ' + blue + ', ' + white);
-    piblaster.setPwm(this.rPin, red / 100);
-    piblaster.setPwm(this.gPin, green / 100);
-    piblaster.setPwm(this.bPin, blue / 100);
-    piblaster.setPwm(this.wPin, white / 100);
+    piblaster.setPwm(this.config.rPin, red / 100);
+    piblaster.setPwm(this.config.gPin, green / 100);
+    piblaster.setPwm(this.config.bPin, blue / 100);
+    piblaster.setPwm(this.config.wPin, white / 100);
   }
 
   hsb2rgbw(H: number, S: number, B: number): RGBW {
