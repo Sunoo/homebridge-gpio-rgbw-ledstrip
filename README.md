@@ -1,6 +1,6 @@
-# homebridge-gpio-rgb-ledstrip
+# homebridge-gpio-rgbw-ledstrip
 
-[![npm](https://img.shields.io/npm/v/homebridge-gpio-rgb-ledstrip) ![npm](https://img.shields.io/npm/dt/homebridge-gpio-rgb-ledstrip)](https://www.npmjs.com/package/homebridge-gpio-rgb-ledstrip)
+[![npm](https://img.shields.io/npm/v/homebridge-gpio-rgbw-ledstrip) ![npm](https://img.shields.io/npm/dt/homebridge-gpio-rgbw-ledstrip)](https://www.npmjs.com/package/homebridge-gpio-rgbw-ledstrip)
 
 [RPi](https://www.raspberrypi.org) GPIO based LED Strip plugin for [Homebridge](https://github.com/nfarina/homebridge)
 
@@ -37,3 +37,7 @@ Configuration sample:
 * "gPin": GPIO pin that is used to set green value (required)
 * "bPin": GPIO pin that is used to set blue value (required)
 * "wPin": GPIO pin that is used to set white value (required)
+
+#### Connecting LED Strips
+
+You'll need to wire up a circuit to connect an LED strip to your Raspberry Pi. A decent guide on doing that is available [here](https://dordnung.de/raspberrypi-ledstrip/).
