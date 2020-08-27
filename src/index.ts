@@ -6,6 +6,7 @@ import {
   Logging,
   Service
 } from 'homebridge';
+import fs from 'fs';
 import { SmartLedStripConfig } from './configTypes';
 const piblaster = require('pi-blaster.js'); // eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -32,37 +33,51 @@ class SmartLedStrip implements AccessoryPlugin {
   }
 
   getServices(): Array<Service> {
-    const accInfo = new hap.Service.AccessoryInformation();
+    let ready = true;
+    if (!this.config.rPin || !this.config.gPin || !this.config.bPin || !this.config.wPin) {
+      this.log.error('Please verify that all GPIO pins have been configured.');
+      ready = false;
+    }
+    if (fs.statSync('/dev/pi-blaster').isFIFO()) {
+      this.log.error('Error connecting to pi-blaster. Please make sure that is correctly installed.');
+      ready = false;
+    }
 
-    accInfo
-      .setCharacteristic(hap.Characteristic.Manufacturer, 'Sunoo')
-      .setCharacteristic(hap.Characteristic.Model, 'RGBW LED Strip')
-      .setCharacteristic(hap.Characteristic.SerialNumber, this.config.rPin + ':' +
+    if (ready) {
+      const accInfo = new hap.Service.AccessoryInformation();
+
+      accInfo
+        .setCharacteristic(hap.Characteristic.Manufacturer, 'Sunoo')
+        .setCharacteristic(hap.Characteristic.Model, 'RGBW LED Strip')
+        .setCharacteristic(hap.Characteristic.SerialNumber, this.config.rPin + ':' +
         this.config.gPin + ':' + this.config.bPin + ':' + this.config.wPin);
 
-    const service = new hap.Service.Lightbulb(this.config.name);
+      const service = new hap.Service.Lightbulb(this.config.name);
 
-    service
-      .getCharacteristic(hap.Characteristic.On)
-      .on('change', this.toggleState.bind(this));
+      service
+        .getCharacteristic(hap.Characteristic.On)
+        .on('change', this.toggleState.bind(this));
 
-    service
-      .addCharacteristic(new hap.Characteristic.Brightness())
-      .on('change', this.toggleState.bind(this));
+      service
+        .addCharacteristic(new hap.Characteristic.Brightness())
+        .on('change', this.toggleState.bind(this));
 
-    service
-      .addCharacteristic(new hap.Characteristic.Hue())
-      .on('change', this.toggleState.bind(this));
+      service
+        .addCharacteristic(new hap.Characteristic.Hue())
+        .on('change', this.toggleState.bind(this));
 
-    service
-      .addCharacteristic(new hap.Characteristic.Saturation())
-      .on('change', this.toggleState.bind(this));
+      service
+        .addCharacteristic(new hap.Characteristic.Saturation())
+        .on('change', this.toggleState.bind(this));
 
-    service.getCharacteristic(hap.Characteristic.Brightness).value = 100;
+      service.getCharacteristic(hap.Characteristic.Brightness).value = 100;
 
-    this.service = service;
+      this.service = service;
 
-    return [accInfo, service];
+      return [accInfo, service];
+    } else {
+      return [];
+    }
   }
 
   toggleState(): void {
