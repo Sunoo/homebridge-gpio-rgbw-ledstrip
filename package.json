@@ -3,7 +3,7 @@
   "name": "homebridge-gpio-rgbw-ledstrip",
   "description": "Raspberry Pi GPIO based LED Strip plugin for Homebridge",
   "main": "dist/index.js",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "repository": {
     "type": "git",
     "url": "git://github.com/Sunoo/homebridge-gpio-rgbw-ledstrip.git"

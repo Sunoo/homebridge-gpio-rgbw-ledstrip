@@ -2,12 +2,15 @@ import {
   AccessoryConfig,
   AccessoryPlugin,
   API,
+  CharacteristicSetCallback,
+  CharacteristicValue,
   HAP,
   Logging,
   Service
 } from 'homebridge';
-import fs from 'fs';
-import piblaster from 'pi-blaster.js';
+import { statSync } from 'fs';
+import { setPwm } from 'pi-blaster.js';
+import { promisify } from 'util';
 import { SmartLedStripConfig } from './configTypes';
 
 let hap: HAP;
@@ -22,14 +25,30 @@ type RGBW = {
   W: number
 };
 
+type Light = {
+  power: boolean,
+  hue: number,
+  saturation: number,
+  brightness: number
+};
+
 class SmartLedStrip implements AccessoryPlugin {
   private readonly log: Logging;
   private readonly config: SmartLedStripConfig;
   private service?: Service;
+  private light: Light;
+
+  private readonly setPwm = promisify(setPwm);
 
   constructor(log: Logging, config: AccessoryConfig, api: API) { // eslint-disable-line @typescript-eslint/no-unused-vars
     this.log = log;
     this.config = config as unknown as SmartLedStripConfig;
+    this.light = {
+      power: false,
+      hue: 0,
+      saturation: 0,
+      brightness: 100
+    };
   }
 
   getServices(): Array<Service> {
@@ -39,7 +58,7 @@ class SmartLedStrip implements AccessoryPlugin {
       ready = false;
     }
     try {
-      if (!fs.statSync('/dev/pi-blaster').isFIFO()) {
+      if (!statSync('/dev/pi-blaster').isFIFO()) {
         throw new Error('not a FIFO, /dev/pi-blaster');
       }
     } catch (err) {
@@ -60,21 +79,31 @@ class SmartLedStrip implements AccessoryPlugin {
 
       service
         .getCharacteristic(hap.Characteristic.On)
-        .on('change', this.toggleState.bind(this));
-
-      service
-        .addCharacteristic(new hap.Characteristic.Brightness())
-        .on('change', this.toggleState.bind(this));
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          this.light.power = value as boolean;
+          this.updateLights(callback);
+        });
 
       service
         .addCharacteristic(new hap.Characteristic.Hue())
-        .on('change', this.toggleState.bind(this));
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          this.light.hue = value as number;
+          this.updateLights(callback);
+        });
 
       service
         .addCharacteristic(new hap.Characteristic.Saturation())
-        .on('change', this.toggleState.bind(this));
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          this.light.saturation = value as number;
+          this.updateLights(callback);
+        });
 
-      service.getCharacteristic(hap.Characteristic.Brightness).value = 100;
+      service
+        .addCharacteristic(new hap.Characteristic.Brightness())
+        .on('set', (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          this.light.brightness = value as number;
+          this.updateLights(callback);
+        });
 
       this.service = service;
 
@@ -84,26 +113,33 @@ class SmartLedStrip implements AccessoryPlugin {
     }
   }
 
-  toggleState(): void {
+  updateLights(callback: CharacteristicSetCallback): void {
     if (this.service) {
-      if (!this.service.getCharacteristic(hap.Characteristic.On).value) {
-        this.updateRGBW(0, 0, 0, 0);
+      let togglePromise: Promise<[void, void, void, void]>;
+      if (!this.light.power) {
+        togglePromise = this.sendRGBW(0, 0, 0, 0);
       } else {
-        const h = this.service.getCharacteristic(hap.Characteristic.Hue).value as number;
-        const s = this.service.getCharacteristic(hap.Characteristic.Saturation).value as number;
-        const b = this.service.getCharacteristic(hap.Characteristic.Brightness).value as number;
-        const rgbw = this.hsb2rgbw(h, s, b);
-        this.updateRGBW(rgbw.R, rgbw.G, rgbw.B, rgbw.W);
+        const rgbw = this.hsb2rgbw(this.light.hue, this.light.saturation, this.light.brightness);
+        togglePromise = this.sendRGBW(rgbw.R, rgbw.G, rgbw.B, rgbw.W);
       }
+      togglePromise
+        .then(() => {
+          callback();
+        })
+        .catch((err) => {
+          this.log.error('Error calling pi-blaster: ' + err);
+          callback(err);
+        });
     }
   }
 
-  updateRGBW(red: number, green: number, blue: number, white: number): void {
+  sendRGBW(red: number, green: number, blue: number, white: number): Promise<[void, void, void, void]> {
     this.log.debug('Setting RGBW: ' + red + ', ' + green + ', ' + blue + ', ' + white);
-    piblaster.setPwm(this.config.rPin, red / 100);
-    piblaster.setPwm(this.config.gPin, green / 100);
-    piblaster.setPwm(this.config.bPin, blue / 100);
-    piblaster.setPwm(this.config.wPin, white / 100);
+    return Promise.all([
+      this.setPwm(this.config.rPin, red / 100),
+      this.setPwm(this.config.gPin, green / 100),
+      this.setPwm(this.config.bPin, blue / 100),
+      this.setPwm(this.config.wPin, white / 100)]);
   }
 
   hsb2rgbw(H: number, S: number, B: number): RGBW {
