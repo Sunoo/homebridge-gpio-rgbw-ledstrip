@@ -7,8 +7,8 @@ import {
   Service
 } from 'homebridge';
 import fs from 'fs';
+import piblaster from 'pi-blaster.js';
 import { SmartLedStripConfig } from './configTypes';
-const piblaster = require('pi-blaster.js'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 let hap: HAP;
 
