@@ -42,7 +42,7 @@ class SmartLedStrip implements AccessoryPlugin {
 
   constructor(log: Logging, config: AccessoryConfig, api: API) { // eslint-disable-line @typescript-eslint/no-unused-vars
     this.log = log;
-    this.config = config as unknown as SmartLedStripConfig;
+    this.config = config as SmartLedStripConfig;
     this.light = {
       power: false,
       hue: 0,
@@ -136,10 +136,10 @@ class SmartLedStrip implements AccessoryPlugin {
   sendRGBW(red: number, green: number, blue: number, white: number): Promise<[void, void, void, void]> {
     this.log.debug('Setting RGBW: ' + red + ', ' + green + ', ' + blue + ', ' + white);
     return Promise.all([
-      this.setPwm(this.config.rPin, red / 100),
-      this.setPwm(this.config.gPin, green / 100),
-      this.setPwm(this.config.bPin, blue / 100),
-      this.setPwm(this.config.wPin, white / 100)]);
+      this.setPwm(this.config.rPin!, red / 100),
+      this.setPwm(this.config.gPin!, green / 100),
+      this.setPwm(this.config.bPin!, blue / 100),
+      this.setPwm(this.config.wPin!, white / 100)]);
   }
 
   hsb2rgbw(H: number, S: number, B: number): RGBW {
